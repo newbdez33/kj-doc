@@ -1,0 +1,74 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# 汉字中国语
+
+Mocking up API
+
+## USER [/login]
+
+### User Login [POST]
+
++ Request (application/json)
+
+        {
+            "email": "user@email.com",
+            "password": "ios"
+        }
+    
++ Response 200 (application/json)
+
+    + Headers
+
+            Location: /payment_finish
+    + Body
+
+            {
+                "results": {
+                    "code":0,
+                    "message":""
+                },
+                "token": "dummy token"
+            }
+            
+
+## 支付 [/payment_finish]
+
+### 购买成功确认 [POST]
+
+用户在客户端发起购买流程，并完全付款后，调用这个API通知Server。
+Server收到通知，并得到客户端发过来的receipt验证后，返回成功或失败的状态。一次只能确认一个购买。
+验证用PHP代码参考：https://my.oschina.net/qianglong/blog/503861
+
+![流程图](http://upload-images.jianshu.io/upload_images/1807646-7bd9b888bfecd8dd.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
++ 请求字段
+    + receipt (required, string, `5rGJ5a2X5Lit5Zu96K`) ... 收据字符串
+    + platform (required, string, `ios`) ... ios或android，用来区别两个平台的提交
+    + class_no (required, string, `1`) ... 课程编号
+    
++ 返回错误号
+    + 1 课程编号不能为空
+    + 21000 - 21008 Apple verifyReceipt error code
+    
++ Request (application/json)
+
+        {
+            "receipt": "5rGJ5a2X5Lit5Zu96K+t",
+            "platform": "ios",
+            "class_no": "1"
+        }
+    
++ Response 200 (application/json)
+
+    + Headers
+
+            Location: /payment_finish
+    + Body
+
+            {
+                "results": {
+                    "code":0,
+                    "message":""
+                }
+            }
